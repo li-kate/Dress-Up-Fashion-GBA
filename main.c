@@ -79,11 +79,6 @@ int main(void) {
         updatePlayer(&player, currentButtons);
         drawPlayer(&player);
         
-        // Debug: Show player position (optional)
-        char posText[30];
-        sprintf(posText, "X: %d Y: %d", player.x, player.y);
-        drawString(5, 5, posText, WHITE);
-        
         // Return to title screen
         if (KEY_JUST_PRESSED(BUTTON_SELECT, currentButtons, previousButtons)) {
             drawFullScreenImageDMA(title_screen);
