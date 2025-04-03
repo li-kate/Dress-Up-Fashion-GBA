@@ -1,4 +1,3 @@
-// character.c
 #include "character.h"
 #include <string.h>
 
@@ -49,7 +48,7 @@ void drawPartOptions(void) {
     drawString(10, 240, "Pants:", WHITE);
     
     // Draw all part options
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 3; i++) {
         drawImageDMA(partOptions[i].y, partOptions[i].x, 
                     partOptions[i].width, partOptions[i].height, 
                     partOptions[i].image);
@@ -62,7 +61,7 @@ void drawPartOptions(void) {
 }
 
 PartOption* getPartAtPosition(int x, int y) {
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 3; i++) {
         if (x >= partOptions[i].x && x <= partOptions[i].x + partOptions[i].width &&
             y >= partOptions[i].y && y <= partOptions[i].y + partOptions[i].height) {
             return &partOptions[i];
