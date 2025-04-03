@@ -1,0 +1,86 @@
+// character.c
+#include "character.h"
+#include <string.h>
+
+// Part options display
+PartOption partOptions[] = {
+    // Heads
+    {180, 30, HEAD_WIDTH, HEAD_HEIGHT, head1, "head"},
+    {180, 60, HEAD_WIDTH, HEAD_HEIGHT, head2, "head"},
+    {180, 90, HEAD_WIDTH, HEAD_HEIGHT, head3, "head"},
+    
+    // Shirts
+    // {210, 30, SHIRT_WIDTH, SHIRT_HEIGHT, shirt1, "shirt"},
+    // {210, 60, SHIRT_WIDTH, SHIRT_HEIGHT, shirt2, "shirt"},
+    // {210, 90, SHIRT_WIDTH, SHIRT_HEIGHT, shirt3, "shirt"},
+    
+    // // Pants
+    // {240, 30, PANTS_WIDTH, PANTS_HEIGHT, pants1, "pants"},
+    // {240, 60, PANTS_WIDTH, PANTS_HEIGHT, pants2, "pants"},
+    // {240, 90, PANTS_WIDTH, PANTS_HEIGHT, pants3, "pants"}
+};
+
+void initCharacter(Character* character) {
+    character->x = 20;
+    character->y = 40;
+    character->currentHead = head1;
+    // character->currentShirt = shirt1;
+    // character->currentPants = pants1;
+}
+
+void drawCharacter(Character* character) {
+    // Head
+    drawImageDMA(character->y, character->x + 8, 
+                HEAD_WIDTH, HEAD_HEIGHT, character->currentHead);
+    
+    // Shirt
+    // drawImageDMA(character->y + HEAD_HEIGHT, character->x, 
+    //             SHIRT_WIDTH, SHIRT_HEIGHT, character->currentShirt);
+    
+    // // Pants
+    // drawImageDMA(character->y + HEAD_HEIGHT + SHIRT_HEIGHT, character->x + 8, 
+    //             PANTS_WIDTH, PANTS_HEIGHT, character->currentPants);
+}
+
+void drawPartOptions(void) {
+    // Draw selection labels
+    drawString(10, 180, "Heads:", WHITE);
+    drawString(10, 210, "Shirts:", WHITE);
+    drawString(10, 240, "Pants:", WHITE);
+    
+    // Draw all part options
+    for (int i = 0; i < 9; i++) {
+        drawImageDMA(partOptions[i].y, partOptions[i].x, 
+                    partOptions[i].width, partOptions[i].height, 
+                    partOptions[i].image);
+        
+        // Draw selection border
+        drawRectDMA(partOptions[i].y - 1, partOptions[i].x - 1, 
+                   partOptions[i].width + 2, partOptions[i].height + 2, 
+                   GRAY);
+    }
+}
+
+PartOption* getPartAtPosition(int x, int y) {
+    for (int i = 0; i < 9; i++) {
+        if (x >= partOptions[i].x && x <= partOptions[i].x + partOptions[i].width &&
+            y >= partOptions[i].y && y <= partOptions[i].y + partOptions[i].height) {
+            return &partOptions[i];
+        }
+    }
+    return NULL;
+}
+
+void selectPart(Character* character, PartOption* part) {
+    if (part == NULL) return;
+    
+    if (strcmp(part->type, "head") == 0) {
+        character->currentHead = part->image;
+    } 
+    // else if (strcmp(part->type, "shirt") == 0) {
+    //     character->currentShirt = part->image;
+    // } 
+    // else if (strcmp(part->type, "pants") == 0) {
+    //     character->currentPants = part->image;
+    // }
+}
