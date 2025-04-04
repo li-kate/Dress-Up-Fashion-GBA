@@ -23,24 +23,20 @@ PartOption partOptions[] = {
 };
 
 void initCharacter(Character* character) {
-    character->x = CHARACTER_START_X;
-    character->y = CHARACTER_START_Y;
     character->currentHead = head1;
     character->currentShirt = shirt1;
     character->currentPants = pants1;
 }
 
-void drawCharacter(Character* character) {
-    // Head
-    drawImageDMA(character->y, character->x + 8, 
-                HEAD_WIDTH, HEAD_HEIGHT, character->currentHead);
+void drawCharacter(Character* character, int x, int y) {
+    // Head (offset by +8 pixels horizontally)
+    drawImageDMA(y, x + 8, HEAD_WIDTH, HEAD_HEIGHT, character->currentHead);
     
-    // Shirt
-    drawImageDMA(character->y + HEAD_HEIGHT, character->x, 
-                SHIRT_WIDTH, SHIRT_HEIGHT, character->currentShirt);
+    // Shirt (no offset)
+    drawImageDMA(y + HEAD_HEIGHT, x, SHIRT_WIDTH, SHIRT_HEIGHT, character->currentShirt);
     
-    // // Pants
-    drawImageDMA(character->y + HEAD_HEIGHT + SHIRT_HEIGHT, character->x + 7, 
+    // Pants (offset by +7 pixels horizontally)
+    drawImageDMA(y + HEAD_HEIGHT + SHIRT_HEIGHT, x + 7, 
                 PANTS_WIDTH, PANTS_HEIGHT, character->currentPants);
 }
 

@@ -13,8 +13,9 @@
 #include "images/title_screen.h"
 #include "images/floorImage.h"
 #include "images/curtains.h"
-#include "images/left_curtain.h"
-#include "images/right_curtain.h"
+#include "images/runway.h"
+// #include "images/left_curtain.h"
+// #include "images/right_curtain.h"
 
 extern int numPartOptions;
 
@@ -83,7 +84,7 @@ int main(void) {
           drawImageDMA(HEIGHT - FLOOR_HEIGHT, 0, WIDTH, FLOOR_HEIGHT, floorImage); // Draw floor
           drawPartOptions(); // Draw part options
           drawImageDMA(0, 0, CURTAINS_WIDTH, CURTAINS_HEIGHT, curtains); // Draw curtains
-          drawCharacter(&character); // Draw character
+          drawCharacter(&character, CHARACTER_START_X, CHARACTER_START_Y);
           state = PLAY;
         }
         break;
@@ -117,7 +118,7 @@ int main(void) {
               if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) { // SHIFT Z
                   selectPart(&character, &partOptions[collidedPart]);
                   // Redraw character with new head
-                  drawCharacter(&character);
+                  drawCharacter(&character, CHARACTER_START_X, CHARACTER_START_Y);
               }
           }
           
@@ -130,10 +131,24 @@ int main(void) {
             state = START;
             initPlayer(&player);
           }
+          // Go to win screen
+          if (KEY_JUST_PRESSED(BUTTON_L, currentButtons, previousButtons)) { // SHIFT A
+            drawFullScreenImageDMA(runway);
+            // Calculate center position
+            int centerX = (WIDTH - SHIRT_WIDTH) / 2; // Shirt is the widest part
+            int centerY = (HEIGHT - (HEAD_HEIGHT + SHIRT_HEIGHT + PANTS_HEIGHT)) / 2;
+            
+            // Draw character at center
+            drawCharacter(&character, centerX, centerY);
+            state = WIN;
+          }
         break;
       case WIN:
 
-        // state = ?
+        if (KEY_JUST_PRESSED(BUTTON_SELECT, currentButtons, previousButtons)) {
+          drawFullScreenImageDMA(title_screen);
+          state = START;
+        }
         break;
       case LOSE:
 

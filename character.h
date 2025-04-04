@@ -29,7 +29,6 @@
 #define CHARACTER_START_Y 20
 
 typedef struct {
-    int x, y; // Character position
     const u16* currentHead;
     const u16* currentShirt;
     const u16* currentPants;
@@ -43,7 +42,7 @@ typedef struct {
 } PartOption;
 
 void initCharacter(Character* character);
-void drawCharacter(Character* character);
+void drawCharacter(Character* character, int x, int y);
 void drawPartOptions(void);
 void selectPart(Character* character, PartOption* part);
 void drawSinglePartOption(int index); 
