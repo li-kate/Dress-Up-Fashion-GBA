@@ -61,34 +61,25 @@ void updatePlayer(Player* player, u32 currentButtons) {
     if (bottomBoundary > HEIGHT - FLOOR_HEIGHT) {  // Floor collision
         player->y = HEIGHT - FLOOR_HEIGHT - player->height;
     }
-
-    player->newX = player->x;
-    player->newY = player->y;
 }
 
 void drawPlayer(Player* player) {
-    // Draw left wing (yellow)
-    drawRectDMA(player->y + (player->height - WING_HEIGHT)/2, 
-                player->x - WING_WIDTH, 
-                WING_WIDTH, WING_HEIGHT, YELLOW);
-    
+    // Left wing of fairy
+    drawRectDMA(player->y + (player->height - WING_HEIGHT)/2, player->x - WING_WIDTH, WING_WIDTH, WING_HEIGHT, YELLOW);
     // Draw main body (fairy image)
     drawImageDMA(player->y, player->x, PLAYER_WIDTH, PLAYER_HEIGHT, fairy);
-    
-    // Draw right wing (yellow)
-    drawRectDMA(player->y + (player->height - WING_HEIGHT)/2, 
-                player->x + player->width, 
-                WING_WIDTH, WING_HEIGHT, YELLOW);
+    // Right wing of fairy
+    drawRectDMA(player->y + (player->height - WING_HEIGHT)/2, player->x + player->width, WING_WIDTH, WING_HEIGHT, YELLOW);
 }
 
+// Check collision with all part options
 int checkPartSelection(Player* player) {
-    // Check collision with all part options
     for (int i = 0; i < numPartOptions; i++) {
         if (player->x + player->width >= partOptions[i].x && 
             player->x <= partOptions[i].x + partOptions[i].width &&
             player->y + player->height >= partOptions[i].y && 
             player->y <= partOptions[i].y + partOptions[i].height) {
-            return i; // Return index of part being hovered
+            return i;
         }
     }
     return -1;

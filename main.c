@@ -14,8 +14,13 @@
 #include "images/floorImage.h"
 #include "images/curtains.h"
 #include "images/runway.h"
-// #include "images/left_curtain.h"
-// #include "images/right_curtain.h"
+#include "images/camera.h"
+
+#include "images/enter1.h"
+#include "images/enter2.h"
+#include "images/enter3.h"
+#include "images/enter4.h"
+#include "images/enter5.h"
 
 extern int numPartOptions;
 
@@ -27,31 +32,42 @@ enum gba_state {
   START,
   PLAY,
   WIN,
-  LOSE,
 };
 
 int main(void) {
   /* TODO: */
   // Manipulate REG_DISPCNT here to set Mode 3. //
   REG_DISPCNT = MODE3 | BG2_ENABLE;
-  // Save current and previous state of button input.
+
   u32 previousButtons = BUTTONS;
   u32 currentButtons = BUTTONS;
 
-  // Load initial application state
+  // initial application state
   enum gba_state state = START;
   drawFullScreenImageDMA(title_screen);
 
-  // Initialize player
+  // player and character
   Player player;
   initPlayer(&player);
   Character character;
   initCharacter(&character);
 
-  // int leftWingX = player.prevX - WING_WIDTH;
-  // int rightWingX = player.prevX + player.width;
-
-  // Bounds partsBounds; // Initialize bounding box for part options
+  // photos
+  int photoCounter = 0;
+  char counterText[11];
+  const char *congratsMessages[] = {
+    "WOW!",
+    "AWESOME OUTFIT!",
+    "STYLISH!",
+    "FABULOUS!",
+    "GORGEOUS!",
+    "AMAZING!",
+    "PERFECT!",
+    "FASHION ICON!",
+    "LOVELY!",
+    "STUNNING!"
+  };
+  int currentMessageIndex = 0;
 
 
   while (1) {
@@ -65,46 +81,55 @@ int main(void) {
     switch (state) {
       case START:
         ;
+        static int animFrame = 0; // static bc we want to keep the value bw frames
+        static int animCounter = 0;
+        const int ANIM_SPEED = 10;
+        int animWidth = ENTER1_WIDTH;
+        int animHeight = ENTER1_HEIGHT;
+        int animX = (WIDTH - animWidth) / 2;
+        int animY = (HEIGHT - animHeight) / 2;
+      
+        switch(animFrame) {
+            case 0: drawImageDMA(animY, animX, animWidth, animHeight, enter1); break;
+            case 1: drawImageDMA(animY, animX, animWidth, animHeight, enter2); break;
+            case 2: drawImageDMA(animY, animX, animWidth, animHeight, enter3); break;
+            case 3: drawImageDMA(animY, animX, animWidth, animHeight, enter4); break;
+            case 4: drawImageDMA(animY, animX, animWidth, animHeight, enter5); break;
+        }
         
-        // Start Button
-        int btnWidth = 90;
-        int btnHeight = 25;
-        int btnX = (WIDTH - btnWidth) / 2;
-        int btnY = (HEIGHT - btnHeight) / 2;
+        // Press enter at center
+        drawRectDMA(HEIGHT/2 - 5, (WIDTH - 70) / 2, 70, 10, PINK);
+        drawCenteredString(HEIGHT/2 - 5, 0, WIDTH, 10, "PRESS ENTER", WHITE);
 
-        u16 btnColor = PINK;
-        drawRectDMA(btnY, btnX, btnWidth, btnHeight, btnColor);
-
-        // Button text
-        drawCenteredString(btnY + btnHeight/2 - 4, btnX, btnWidth, 8, "PRESS ENTER", WHITE);
+        // Update animation frame
+        animCounter++;
+        if (animCounter >= ANIM_SPEED) {
+            animCounter = 0;
+            animFrame++;
+            if (animFrame > 4) animFrame = 0;
+        }
         
-        // Button functionality
+        // button to dress up
         if (KEY_JUST_PRESSED(BUTTON_START, currentButtons, previousButtons)) {
           drawRectDMA(0, CURTAINS_WIDTH, WIDTH - CURTAINS_WIDTH, HEIGHT - FLOOR_HEIGHT, WHITE); // Draw white background
           drawImageDMA(HEIGHT - FLOOR_HEIGHT, 0, WIDTH, FLOOR_HEIGHT, floorImage); // Draw floor
           drawPartOptions(); // Draw part options
           drawImageDMA(0, 0, CURTAINS_WIDTH, CURTAINS_HEIGHT, curtains); // Draw curtains
-          drawCharacter(&character, CHARACTER_START_X, CHARACTER_START_Y);
+          drawCharacter(&character, CHARACTER_START_X, CHARACTER_START_Y); // Draw character
           state = PLAY;
         }
         break;
       
       case PLAY:
-          // Calculate wing positions
-          // leftWingX = player.prevX - WING_WIDTH;
-          // rightWingX = player.prevX + player.width;
-          
-          // Only erase previous position if player moved
-          if (player.prevX != player.x || player.prevY != player.y) {
-            // Erase only the player's previous position (including wings)
+          // erase the previous player position
+          if ((player.prevX != player.x || player.prevY != player.y) &&
+          player.prevX >= CURTAINS_WIDTH + WING_WIDTH && 
+          player.prevX + player.width + WING_WIDTH <= WIDTH &&
+          player.prevY >= 0 && 
+          player.prevY + player.height <= HEIGHT - FLOOR_HEIGHT) {
             int eraseWidth = player.width + 2*WING_WIDTH;
             int eraseX = player.prevX - WING_WIDTH;
             drawRectDMA(player.prevY, eraseX, eraseWidth, player.height, WHITE);
-            // for (int i = 0; i < numPartOptions; i++) {
-            //     if (checkPartsOverlap(player.prevX, player.prevY, player.width, player.height)) {
-            //         drawSinglePartOption(i);
-            //     }
-            // }
             redrawPartsUnderPlayer(&player);
           }
           
@@ -112,17 +137,14 @@ int main(void) {
           updatePlayer(&player, currentButtons);
           int collidedPart = checkPartSelection(&player);
           
-          // Handle part selection
+          // Part selection functionality
           if (collidedPart >= 0) {
-              // If B button pressed, select this part
               if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) { // SHIFT Z
                   selectPart(&character, &partOptions[collidedPart]);
-                  // Redraw character with new head
                   drawCharacter(&character, CHARACTER_START_X, CHARACTER_START_Y);
               }
           }
           
-          // Draw player last to ensure it's on top
           drawPlayer(&player);
           
           // Return to title screen
@@ -132,27 +154,50 @@ int main(void) {
             initPlayer(&player);
           }
           // Go to win screen
-          if (KEY_JUST_PRESSED(BUTTON_L, currentButtons, previousButtons)) { // SHIFT A
+          if (KEY_JUST_PRESSED(BUTTON_START, currentButtons, previousButtons)) { // ENTER
             drawFullScreenImageDMA(runway);
-            // Calculate center position
-            int centerX = (WIDTH - SHIRT_WIDTH) / 2; // Shirt is the widest part
+            int centerX = (WIDTH - SHIRT_WIDTH) / 2;
             int centerY = (HEIGHT - (HEAD_HEIGHT + SHIRT_HEIGHT + PANTS_HEIGHT)) / 2;
             
             // Draw character at center
             drawCharacter(&character, centerX, centerY);
             state = WIN;
+
+            // Add camera
+            drawImageDMA(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, camera);
+
+            // Draw photo counter
+            sprintf(counterText, "%d", photoCounter);
+            drawString(10, 40, counterText, WHITE);
           }
         break;
       case WIN:
+        // Display  message every 10 photos
+        if (photoCounter > 0 && photoCounter % 10 == 0) {
+          currentMessageIndex = (photoCounter / 10 - 1) % 10;
+          
+          // Clear message area for new message
+          int messageY = HEIGHT - 30;
+          drawRectDMA(messageY, WIDTH/2 - 50, 100, 20, WHITE);
+          
+          // Draw new message
+          drawCenteredString(messageY, WIDTH/2 - 80, 160, 20, 
+            (char *)congratsMessages[currentMessageIndex], PINK);
+        }
+        
+        // Increment counter when B/Z is pressed
+        if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) {
+            photoCounter++;
+            drawRectDMA(10, 40, 40, 10, BLACK);
+            sprintf(counterText, "%d", photoCounter);
+            drawString(10, 40, counterText, WHITE);
+        }
 
         if (KEY_JUST_PRESSED(BUTTON_SELECT, currentButtons, previousButtons)) {
           drawFullScreenImageDMA(title_screen);
           state = START;
+          photoCounter = 0;
         }
-        break;
-      case LOSE:
-
-        // state = ?
         break;
     }
 

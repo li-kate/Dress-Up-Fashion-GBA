@@ -7,12 +7,11 @@
 typedef struct {
     int x, y;           // Current position
     int prevX, prevY;   // Previous position
-    int newX, newY;   // New position after update
     int width, height;
     int velX, velY;
 } Player;
 
-// Player dimensions
+// Fairy dimensions
 #define PLAYER_WIDTH FAIRY_WIDTH
 #define PLAYER_HEIGHT FAIRY_HEIGHT
 #define WING_WIDTH 5

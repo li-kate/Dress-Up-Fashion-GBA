@@ -4,7 +4,6 @@
 #include "gba.h"
 #include "player.h"
 
-// Part options
 #include "images/head1.h"
 #include "images/head2.h"
 #include "images/head3.h"
