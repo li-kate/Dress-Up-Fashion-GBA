@@ -85,86 +85,58 @@ int main(void) {
         break;
       
       case PLAY:
-        // background - not floor
-        // Get parts bounding area
-        // partsBounds = getPartsBounds();
-        
-        // // Draw white background in 4 rectangles around the parts area
-        // // 1. Top section (above parts)
-        // if (partsBounds.y1 > CURTAINS_WIDTH) {
-        //     drawRectDMA(0, CURTAINS_WIDTH, 
-        //               WIDTH - CURTAINS_WIDTH, partsBounds.y1 - CURTAINS_WIDTH, 
-        //               WHITE);
-        // }
-        
-        // // 2. Left section (left of parts)
-        // if (partsBounds.x1 > CURTAINS_WIDTH) {
-        //     drawRectDMA(partsBounds.y1, CURTAINS_WIDTH,
-        //               partsBounds.x1 - CURTAINS_WIDTH, partsBounds.y2 - partsBounds.y1,
-        //               WHITE);
-        // }
-        
-        // // 3. Right section (right of parts)
-        // if (partsBounds.x2 < WIDTH) {
-        //     drawRectDMA(partsBounds.y1, partsBounds.x2,
-        //               WIDTH - partsBounds.x2, partsBounds.y2 - partsBounds.y1,
-        //               WHITE);
-        // }
-        
-        // // 4. Bottom section (below parts)
-        // if (partsBounds.y2 < HEIGHT - FLOOR_HEIGHT) {
-        //     drawRectDMA(partsBounds.y2, CURTAINS_WIDTH,
-        //               WIDTH - CURTAINS_WIDTH, (HEIGHT - FLOOR_HEIGHT) - partsBounds.y2,
-        //               WHITE);
-        // }
-        leftWingX = player.prevX - WING_WIDTH;
-        rightWingX = player.prevX + player.width;
-        
-        // Draw white background where player was (main body + wings)
-        // 1. Left wing
-        drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2, 
-                   leftWingX,
-                   WING_WIDTH, WING_HEIGHT,
-                   WHITE);
-        
-        // 2. Main body
-        drawRectDMA(player.prevY,
-                   player.prevX,
-                   player.width, player.height,
-                   WHITE);
-        
-        // 3. Right wing
-        drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2,
-                   rightWingX,
-                   WING_WIDTH, WING_HEIGHT,
-                   WHITE);
-
-        // drawRectDMA(player.prevY, player.prevX - WING_WIDTH, player.width + WING_WIDTH, player.height, WHITE);
-        
-        // Update and draw player
-        updatePlayer(&player, currentButtons);
-        int collidedPart = checkPartSelection(&player);
-    
-        // Only draw the collided part (if any)
-        if (collidedPart >= 0) {
-          drawSinglePartOption(collidedPart);
+          // Calculate wing positions
+          leftWingX = player.prevX - WING_WIDTH;
+          rightWingX = player.prevX + player.width;
+          
+          // Only erase previous position if player moved
+          if (player.prevX != player.x || player.prevY != player.y) {
+            // Erase left wing
+            drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2, 
+                       leftWingX,
+                       WING_WIDTH, WING_HEIGHT,
+                       WHITE);
+            
+            // Erase main body
+            drawRectDMA(player.prevY,
+                       player.prevX,
+                       player.width, player.height,
+                       WHITE);
+            
+            // Erase right wing
+            drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2,
+                       rightWingX,
+                       WING_WIDTH, WING_HEIGHT,
+                       WHITE);
+          }
+          
+          // Update and draw player
+          updatePlayer(&player, currentButtons);
+          int collidedPart = checkPartSelection(&player);
+          
           // Handle part selection
-          if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) {
-            PartOption* selected = getPartAtPosition(player.x, player.y);
-            if (selected) {
+          if (collidedPart >= 0) {
+            // Redraw the part first to ensure it's under the player
+            drawSinglePartOption(collidedPart);
+            
+            if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) {
+              PartOption* selected = getPartAtPosition(player.x, player.y);
+              if (selected) {
                 selectPart(&character, selected);
                 drawCharacter(&character);
+              }
             }
           }
-        }
-        drawPlayer(&player);
-        
-        // Return to title screen
-        if (KEY_JUST_PRESSED(BUTTON_SELECT, currentButtons, previousButtons)) {
+          
+          // Draw player last to ensure it's on top
+          drawPlayer(&player);
+          
+          // Return to title screen
+          if (KEY_JUST_PRESSED(BUTTON_SELECT, currentButtons, previousButtons)) {
             drawFullScreenImageDMA(title_screen);
             state = START;
-            initPlayer(&player); // Reset player position
-        }
+            initPlayer(&player);
+          }
         break;
       case WIN:
 

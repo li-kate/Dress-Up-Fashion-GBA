@@ -42,12 +42,7 @@ void drawCharacter(Character* character) {
     //             PANTS_WIDTH, PANTS_HEIGHT, character->currentPants);
 }
 
-void drawPartOptions(void) {
-    // Draw selection labels
-    // drawString(10, 180, "Heads:", BLACK);
-    // drawString(10, 210, "Shirts:", BLACK);
-    // drawString(10, 240, "Pants:", BLACK);
-    
+void drawPartOptions(void) {  
     // Draw all part options
     for (int i = 0; i < 3; i++) {
         drawSinglePartOption(i);
@@ -55,19 +50,13 @@ void drawPartOptions(void) {
 }
 
 void drawSinglePartOption(int index) {
-    if (index >= 0 && index < 9) { // Assuming 9 total parts
+    if (index >= 0 && index < 3) {
+        // Draw part image
         drawImageDMA(partOptions[index].y, 
                     partOptions[index].x,
                     partOptions[index].width,
                     partOptions[index].height,
                     partOptions[index].image);
-        
-        // Draw border
-        drawRectDMA(partOptions[index].y - 1, 
-                   partOptions[index].x - 1,
-                   partOptions[index].width + 2,
-                   partOptions[index].height + 2,
-                   GRAY);
     }
 }
 
