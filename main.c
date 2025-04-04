@@ -14,6 +14,8 @@
 #include "images/floorImage.h"
 #include "images/curtains.h"
 
+extern int numPartOptions;
+
 
 /* TODO: */
 // Add any additional states you need for your app. You are not requried to use
@@ -108,6 +110,11 @@ int main(void) {
                        rightWingX,
                        WING_WIDTH, WING_HEIGHT,
                        WHITE);
+            for (int i = 0; i < numPartOptions; i++) {
+                if (checkPartsOverlap(player.prevX, player.prevY, player.width, player.height)) {
+                    drawSinglePartOption(i);
+                }
+            }
           }
           
           // Update and draw player
@@ -116,16 +123,12 @@ int main(void) {
           
           // Handle part selection
           if (collidedPart >= 0) {
-            // Redraw the part first to ensure it's under the player
-            drawSinglePartOption(collidedPart);
-            
-            if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) {
-              PartOption* selected = getPartAtPosition(player.x, player.y);
-              if (selected) {
-                selectPart(&character, selected);
-                drawCharacter(&character);
+              // If B button pressed, select this part
+              if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) { // SHIFT Z
+                  selectPart(&character, &partOptions[collidedPart]);
+                  // Redraw character with new head
+                  drawCharacter(&character);
               }
-            }
           }
           
           // Draw player last to ensure it's on top

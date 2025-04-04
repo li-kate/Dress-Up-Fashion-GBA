@@ -3,29 +3,31 @@
 #include "player.h"
 
 // Part options display
+int numPartOptions = 9; // Number of part options
+
 PartOption partOptions[] = {
-    // Heads
-    {HEAD_START_X, HEAD_START_Y, HEAD_WIDTH, HEAD_HEIGHT, head1, "head"},
-    {HEAD_START_X + 40, HEAD_START_Y, HEAD_WIDTH, HEAD_HEIGHT, head2, "head"},
-    {HEAD_START_X + 80, HEAD_START_Y, HEAD_WIDTH, HEAD_HEIGHT, head3, "head"},
+    // Heads (top row)
+    {FIRST_SHIRT_X + 7, FIRST_SHIRT_Y - 30, HEAD_WIDTH, HEAD_HEIGHT, head1, "head"},
+    {FIRST_SHIRT_X + 7 + 45, FIRST_SHIRT_Y - 30, HEAD_WIDTH, HEAD_HEIGHT, head2, "head"},
+    {FIRST_SHIRT_X + 7 + 90, FIRST_SHIRT_Y - 30, HEAD_WIDTH, HEAD_HEIGHT, head3, "head"},
     
-    // Shirts
-    // {210, 30, SHIRT_WIDTH, SHIRT_HEIGHT, shirt1, "shirt"},
-    // {210, 60, SHIRT_WIDTH, SHIRT_HEIGHT, shirt2, "shirt"},
-    // {210, 90, SHIRT_WIDTH, SHIRT_HEIGHT, shirt3, "shirt"},
+    // Shirts (middle row)
+    {FIRST_SHIRT_X, FIRST_SHIRT_Y, SHIRT_WIDTH, SHIRT_HEIGHT, shirt1, "shirt"},
+    {FIRST_SHIRT_X + 45, FIRST_SHIRT_Y, SHIRT_WIDTH, SHIRT_HEIGHT, shirt2, "shirt"},
+    {FIRST_SHIRT_X + 45 + 45, FIRST_SHIRT_Y, SHIRT_WIDTH, SHIRT_HEIGHT, shirt3, "shirt"},
     
     // // Pants
-    // {240, 30, PANTS_WIDTH, PANTS_HEIGHT, pants1, "pants"},
-    // {240, 60, PANTS_WIDTH, PANTS_HEIGHT, pants2, "pants"},
-    // {240, 90, PANTS_WIDTH, PANTS_HEIGHT, pants3, "pants"}
+    {FIRST_SHIRT_X + 7, FIRST_SHIRT_Y + 40, PANTS_WIDTH, PANTS_HEIGHT, pants1, "pants"},
+    {FIRST_SHIRT_X + 7 + 45, FIRST_SHIRT_Y + 40, PANTS_WIDTH, PANTS_HEIGHT, pants2, "pants"},
+    {FIRST_SHIRT_X + 7 + 90, FIRST_SHIRT_Y + 40, PANTS_WIDTH, PANTS_HEIGHT, pants3, "pants"}
 };
 
 void initCharacter(Character* character) {
-    character->x = 20;
-    character->y = 40;
+    character->x = CHARACTER_START_X;
+    character->y = CHARACTER_START_Y;
     character->currentHead = head1;
-    // character->currentShirt = shirt1;
-    // character->currentPants = pants1;
+    character->currentShirt = shirt1;
+    character->currentPants = pants1;
 }
 
 void drawCharacter(Character* character) {
@@ -34,23 +36,23 @@ void drawCharacter(Character* character) {
                 HEAD_WIDTH, HEAD_HEIGHT, character->currentHead);
     
     // Shirt
-    // drawImageDMA(character->y + HEAD_HEIGHT, character->x, 
-    //             SHIRT_WIDTH, SHIRT_HEIGHT, character->currentShirt);
+    drawImageDMA(character->y + HEAD_HEIGHT, character->x, 
+                SHIRT_WIDTH, SHIRT_HEIGHT, character->currentShirt);
     
     // // Pants
-    // drawImageDMA(character->y + HEAD_HEIGHT + SHIRT_HEIGHT, character->x + 8, 
-    //             PANTS_WIDTH, PANTS_HEIGHT, character->currentPants);
+    drawImageDMA(character->y + HEAD_HEIGHT + SHIRT_HEIGHT, character->x + 7, 
+                PANTS_WIDTH, PANTS_HEIGHT, character->currentPants);
 }
 
 void drawPartOptions(void) {  
     // Draw all part options
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < numPartOptions; i++) {
         drawSinglePartOption(i);
     }
 }
 
 void drawSinglePartOption(int index) {
-    if (index >= 0 && index < 3) {
+    if (index >= 0 && index < numPartOptions) {
         // Draw part image
         drawImageDMA(partOptions[index].y, 
                     partOptions[index].x,
@@ -61,7 +63,7 @@ void drawSinglePartOption(int index) {
 }
 
 PartOption* getPartAtPosition(int x, int y) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < numPartOptions; i++) {
         if (x >= partOptions[i].x && x <= partOptions[i].x + partOptions[i].width &&
             y >= partOptions[i].y && y <= partOptions[i].y + partOptions[i].height) {
             return &partOptions[i];
@@ -76,33 +78,19 @@ void selectPart(Character* character, PartOption* part) {
     if (strcmp(part->type, "head") == 0) {
         character->currentHead = part->image;
     } 
-    // else if (strcmp(part->type, "shirt") == 0) {
-    //     character->currentShirt = part->image;
-    // } 
-    // else if (strcmp(part->type, "pants") == 0) {
-    //     character->currentPants = part->image;
-    // }
+    else if (strcmp(part->type, "shirt") == 0) {
+        character->currentShirt = part->image;
+    } 
+    else if (strcmp(part->type, "pants") == 0) {
+        character->currentPants = part->image;
+    }
 }
 
-// Bounds getPartsBounds(void) {
-//     Bounds bounds = {WIDTH, HEIGHT, 0, 0};
-//     for (int i = 0; i < 9; i++) {
-//         if (partOptions[i].x < bounds.x1) bounds.x1 = partOptions[i].x;
-//         if (partOptions[i].y < bounds.y1) bounds.y1 = partOptions[i].y;
-//         if (partOptions[i].x + partOptions[i].width > bounds.x2) 
-//             bounds.x2 = partOptions[i].x + partOptions[i].width;
-//         if (partOptions[i].y + partOptions[i].height > bounds.y2) 
-//             bounds.y2 = partOptions[i].y + partOptions[i].height;
-//     }
-//     return bounds;
-// }
-
 int checkPartsOverlap(int x, int y, int width, int height) {
-    // Expand check area to include wings
     int checkX = x - WING_WIDTH;
     int checkWidth = width + 2*WING_WIDTH;
     
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < numPartOptions; i++) {
         if (checkX < partOptions[i].x + partOptions[i].width &&
             checkX + checkWidth > partOptions[i].x &&
             y < partOptions[i].y + partOptions[i].height &&

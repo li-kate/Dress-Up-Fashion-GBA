@@ -6,9 +6,11 @@
 #include "images/curtains.h"
 #include "character.h"
 
+extern int numPartOptions;
+
 void initPlayer(Player* player) {
     player->x = WIDTH / 2 - PLAYER_WIDTH / 2;
-    player->y = HEIGHT / 2 - PLAYER_HEIGHT / 2; // Start in center
+    player->y = HEIGHT / 2 - PLAYER_HEIGHT / 2;
     player->width = PLAYER_WIDTH;
     player->height = PLAYER_HEIGHT;
     player->velX = 0;
@@ -78,7 +80,7 @@ void drawPlayer(Player* player) {
 
 int checkPartSelection(Player* player) {
     // Check collision with all part options
-    for (int i = 0; i < 3; i++) {  // Changed from 3 to 9 to check all parts
+    for (int i = 0; i < numPartOptions; i++) {
         if (player->x + player->width >= partOptions[i].x && 
             player->x <= partOptions[i].x + partOptions[i].width &&
             player->y + player->height >= partOptions[i].y && 
