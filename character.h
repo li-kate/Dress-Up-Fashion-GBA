@@ -2,6 +2,7 @@
 #define CHARACTER_H
 
 #include "gba.h"
+#include "player.h"
 
 // Part options
 #include "images/head1.h"
@@ -49,5 +50,6 @@ void drawSinglePartOption(int index);
 PartOption* getPartAtPosition(int x, int y);
 extern PartOption partOptions[9]; 
 int checkPartsOverlap(int x, int y, int width, int height);
+void redrawPartsUnderPlayer(Player* player);
 
 #endif

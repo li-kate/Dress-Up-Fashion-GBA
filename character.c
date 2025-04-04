@@ -62,6 +62,40 @@ void drawSinglePartOption(int index) {
     }
 }
 
+void redrawPartsUnderPlayer(Player* player) {
+    // Calculate the exact area the player just vacated
+    int left = player->prevX - WING_WIDTH;
+    int right = player->prevX + player->width + WING_WIDTH;
+    int top = player->prevY;
+    int bottom = player->prevY + player->height;
+    
+    // Check all parts for overlap with this area
+    for (int i = 0; i < numPartOptions; i++) {
+        PartOption* part = &partOptions[i];
+        
+        // Calculate intersection between vacated area and part
+        int intersectLeft = MAX(left, part->x);
+        int intersectRight = MIN(right, part->x + part->width);
+        int intersectTop = MAX(top, part->y);
+        int intersectBottom = MIN(bottom, part->y + part->height);
+        
+        if (intersectLeft < intersectRight && intersectTop < intersectBottom) {
+            // Calculate source and destination coordinates
+            int srcX = intersectLeft - part->x;
+            int srcY = intersectTop - part->y;
+            int width = intersectRight - intersectLeft;
+            int height = intersectBottom - intersectTop;
+            
+            // Draw only the affected portion of the part
+            for (int y = 0; y < height; y++) {
+                DMA[3].src = &part->image[(srcY + y) * part->width + srcX];
+                DMA[3].dst = &videoBuffer[OFFSET(intersectTop + y, intersectLeft, WIDTH)];
+                DMA[3].cnt = width | DMA_ON | DMA_SOURCE_INCREMENT | DMA_DESTINATION_INCREMENT;
+            }
+        }
+    }
+}
+
 PartOption* getPartAtPosition(int x, int y) {
     for (int i = 0; i < numPartOptions; i++) {
         if (x >= partOptions[i].x && x <= partOptions[i].x + partOptions[i].width &&

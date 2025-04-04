@@ -61,6 +61,9 @@ void updatePlayer(Player* player, u32 currentButtons) {
     if (bottomBoundary > HEIGHT - FLOOR_HEIGHT) {  // Floor collision
         player->y = HEIGHT - FLOOR_HEIGHT - player->height;
     }
+
+    player->newX = player->x;
+    player->newY = player->y;
 }
 
 void drawPlayer(Player* player) {

@@ -13,6 +13,8 @@
 #include "images/title_screen.h"
 #include "images/floorImage.h"
 #include "images/curtains.h"
+#include "images/left_curtain.h"
+#include "images/right_curtain.h"
 
 extern int numPartOptions;
 
@@ -45,8 +47,8 @@ int main(void) {
   Character character;
   initCharacter(&character);
 
-  int leftWingX = player.prevX - WING_WIDTH;
-  int rightWingX = player.prevX + player.width;
+  // int leftWingX = player.prevX - WING_WIDTH;
+  // int rightWingX = player.prevX + player.width;
 
   // Bounds partsBounds; // Initialize bounding box for part options
 
@@ -78,43 +80,31 @@ int main(void) {
         // Button functionality
         if (KEY_JUST_PRESSED(BUTTON_START, currentButtons, previousButtons)) {
           drawRectDMA(0, CURTAINS_WIDTH, WIDTH - CURTAINS_WIDTH, HEIGHT - FLOOR_HEIGHT, WHITE); // Draw white background
-          drawImageDMA(0, 0, CURTAINS_WIDTH, CURTAINS_HEIGHT, curtains); // Draw curtains
           drawImageDMA(HEIGHT - FLOOR_HEIGHT, 0, WIDTH, FLOOR_HEIGHT, floorImage); // Draw floor
-          drawCharacter(&character); // Draw character
           drawPartOptions(); // Draw part options
+          drawImageDMA(0, 0, CURTAINS_WIDTH, CURTAINS_HEIGHT, curtains); // Draw curtains
+          drawCharacter(&character); // Draw character
           state = PLAY;
         }
         break;
       
       case PLAY:
           // Calculate wing positions
-          leftWingX = player.prevX - WING_WIDTH;
-          rightWingX = player.prevX + player.width;
+          // leftWingX = player.prevX - WING_WIDTH;
+          // rightWingX = player.prevX + player.width;
           
           // Only erase previous position if player moved
           if (player.prevX != player.x || player.prevY != player.y) {
-            // Erase left wing
-            drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2, 
-                       leftWingX,
-                       WING_WIDTH, WING_HEIGHT,
-                       WHITE);
-            
-            // Erase main body
-            drawRectDMA(player.prevY,
-                       player.prevX,
-                       player.width, player.height,
-                       WHITE);
-            
-            // Erase right wing
-            drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2,
-                       rightWingX,
-                       WING_WIDTH, WING_HEIGHT,
-                       WHITE);
-            for (int i = 0; i < numPartOptions; i++) {
-                if (checkPartsOverlap(player.prevX, player.prevY, player.width, player.height)) {
-                    drawSinglePartOption(i);
-                }
-            }
+            // Erase only the player's previous position (including wings)
+            int eraseWidth = player.width + 2*WING_WIDTH;
+            int eraseX = player.prevX - WING_WIDTH;
+            drawRectDMA(player.prevY, eraseX, eraseWidth, player.height, WHITE);
+            // for (int i = 0; i < numPartOptions; i++) {
+            //     if (checkPartsOverlap(player.prevX, player.prevY, player.width, player.height)) {
+            //         drawSinglePartOption(i);
+            //     }
+            // }
+            redrawPartsUnderPlayer(&player);
           }
           
           // Update and draw player

@@ -7,6 +7,7 @@
 typedef struct {
     int x, y;           // Current position
     int prevX, prevY;   // Previous position
+    int newX, newY;   // New position after update
     int width, height;
     int velX, velY;
 } Player;
@@ -17,6 +18,9 @@ typedef struct {
 #define WING_WIDTH 5
 #define WING_HEIGHT 5
 #define PLAYER_SPEED 2
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 void initPlayer(Player* player);
 void updatePlayer(Player* player, u32 currentButtons);
