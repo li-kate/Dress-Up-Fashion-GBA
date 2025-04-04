@@ -1,5 +1,4 @@
 # Dress Up Fashion on GBA
-## About the Game
 Step into the world of fashion and creativity with *Dress Up Fashion* — a vibrant and interactive dress-up game where you become the ultimate stylist! 
 Mix and match a variety of outfit choices to create your perfect look. Once you're runway-ready, hit the catwalk and snap photos of your stylish creation!
 
