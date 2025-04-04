@@ -1,12 +1,13 @@
 #include "character.h"
 #include <string.h>
+#include "player.h"
 
 // Part options display
 PartOption partOptions[] = {
     // Heads
-    {180, 30, HEAD_WIDTH, HEAD_HEIGHT, head1, "head"},
-    {180, 60, HEAD_WIDTH, HEAD_HEIGHT, head2, "head"},
-    {180, 90, HEAD_WIDTH, HEAD_HEIGHT, head3, "head"},
+    {HEAD_START_X, HEAD_START_Y, HEAD_WIDTH, HEAD_HEIGHT, head1, "head"},
+    {HEAD_START_X + 40, HEAD_START_Y, HEAD_WIDTH, HEAD_HEIGHT, head2, "head"},
+    {HEAD_START_X + 80, HEAD_START_Y, HEAD_WIDTH, HEAD_HEIGHT, head3, "head"},
     
     // Shirts
     // {210, 30, SHIRT_WIDTH, SHIRT_HEIGHT, shirt1, "shirt"},
@@ -43,19 +44,29 @@ void drawCharacter(Character* character) {
 
 void drawPartOptions(void) {
     // Draw selection labels
-    drawString(10, 180, "Heads:", WHITE);
-    drawString(10, 210, "Shirts:", WHITE);
-    drawString(10, 240, "Pants:", WHITE);
+    // drawString(10, 180, "Heads:", BLACK);
+    // drawString(10, 210, "Shirts:", BLACK);
+    // drawString(10, 240, "Pants:", BLACK);
     
     // Draw all part options
     for (int i = 0; i < 3; i++) {
-        drawImageDMA(partOptions[i].y, partOptions[i].x, 
-                    partOptions[i].width, partOptions[i].height, 
-                    partOptions[i].image);
+        drawSinglePartOption(i);
+    }
+}
+
+void drawSinglePartOption(int index) {
+    if (index >= 0 && index < 9) { // Assuming 9 total parts
+        drawImageDMA(partOptions[index].y, 
+                    partOptions[index].x,
+                    partOptions[index].width,
+                    partOptions[index].height,
+                    partOptions[index].image);
         
-        // Draw selection border
-        drawRectDMA(partOptions[i].y - 1, partOptions[i].x - 1, 
-                   partOptions[i].width + 2, partOptions[i].height + 2, 
+        // Draw border
+        drawRectDMA(partOptions[index].y - 1, 
+                   partOptions[index].x - 1,
+                   partOptions[index].width + 2,
+                   partOptions[index].height + 2,
                    GRAY);
     }
 }
@@ -82,4 +93,33 @@ void selectPart(Character* character, PartOption* part) {
     // else if (strcmp(part->type, "pants") == 0) {
     //     character->currentPants = part->image;
     // }
+}
+
+// Bounds getPartsBounds(void) {
+//     Bounds bounds = {WIDTH, HEIGHT, 0, 0};
+//     for (int i = 0; i < 9; i++) {
+//         if (partOptions[i].x < bounds.x1) bounds.x1 = partOptions[i].x;
+//         if (partOptions[i].y < bounds.y1) bounds.y1 = partOptions[i].y;
+//         if (partOptions[i].x + partOptions[i].width > bounds.x2) 
+//             bounds.x2 = partOptions[i].x + partOptions[i].width;
+//         if (partOptions[i].y + partOptions[i].height > bounds.y2) 
+//             bounds.y2 = partOptions[i].y + partOptions[i].height;
+//     }
+//     return bounds;
+// }
+
+int checkPartsOverlap(int x, int y, int width, int height) {
+    // Expand check area to include wings
+    int checkX = x - WING_WIDTH;
+    int checkWidth = width + 2*WING_WIDTH;
+    
+    for (int i = 0; i < 9; i++) {
+        if (checkX < partOptions[i].x + partOptions[i].width &&
+            checkX + checkWidth > partOptions[i].x &&
+            y < partOptions[i].y + partOptions[i].height &&
+            y + height > partOptions[i].y) {
+            return 1;
+        }
+    }
+    return 0;
 }

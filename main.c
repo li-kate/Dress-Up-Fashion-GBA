@@ -12,6 +12,7 @@
 // image:
 #include "images/title_screen.h"
 #include "images/floorImage.h"
+#include "images/curtains.h"
 
 
 /* TODO: */
@@ -42,6 +43,11 @@ int main(void) {
   Character character;
   initCharacter(&character);
 
+  int leftWingX = player.prevX - WING_WIDTH;
+  int rightWingX = player.prevX + player.width;
+
+  // Bounds partsBounds; // Initialize bounding box for part options
+
 
   while (1) {
     currentButtons = BUTTONS; // Load the current state of the buttons
@@ -69,30 +75,89 @@ int main(void) {
         
         // Button functionality
         if (KEY_JUST_PRESSED(BUTTON_START, currentButtons, previousButtons)) {
-          // Draw floor
-          drawImageDMA(HEIGHT - FLOOR_HEIGHT, 0, WIDTH, FLOOR_HEIGHT, floorImage);
+          drawRectDMA(0, CURTAINS_WIDTH, WIDTH - CURTAINS_WIDTH, HEIGHT - FLOOR_HEIGHT, WHITE); // Draw white background
+          drawImageDMA(0, 0, CURTAINS_WIDTH, CURTAINS_HEIGHT, curtains); // Draw curtains
+          drawImageDMA(HEIGHT - FLOOR_HEIGHT, 0, WIDTH, FLOOR_HEIGHT, floorImage); // Draw floor
+          drawCharacter(&character); // Draw character
+          drawPartOptions(); // Draw part options
           state = PLAY;
         }
         break;
       
       case PLAY:
         // background - not floor
-        drawRectDMA(0, 0, WIDTH, HEIGHT - FLOOR_HEIGHT, WHITE);
-
-        // Draw character
-        drawCharacter(&character);
+        // Get parts bounding area
+        // partsBounds = getPartsBounds();
         
-        // Draw part selection options
-        drawPartOptions();
+        // // Draw white background in 4 rectangles around the parts area
+        // // 1. Top section (above parts)
+        // if (partsBounds.y1 > CURTAINS_WIDTH) {
+        //     drawRectDMA(0, CURTAINS_WIDTH, 
+        //               WIDTH - CURTAINS_WIDTH, partsBounds.y1 - CURTAINS_WIDTH, 
+        //               WHITE);
+        // }
+        
+        // // 2. Left section (left of parts)
+        // if (partsBounds.x1 > CURTAINS_WIDTH) {
+        //     drawRectDMA(partsBounds.y1, CURTAINS_WIDTH,
+        //               partsBounds.x1 - CURTAINS_WIDTH, partsBounds.y2 - partsBounds.y1,
+        //               WHITE);
+        // }
+        
+        // // 3. Right section (right of parts)
+        // if (partsBounds.x2 < WIDTH) {
+        //     drawRectDMA(partsBounds.y1, partsBounds.x2,
+        //               WIDTH - partsBounds.x2, partsBounds.y2 - partsBounds.y1,
+        //               WHITE);
+        // }
+        
+        // // 4. Bottom section (below parts)
+        // if (partsBounds.y2 < HEIGHT - FLOOR_HEIGHT) {
+        //     drawRectDMA(partsBounds.y2, CURTAINS_WIDTH,
+        //               WIDTH - CURTAINS_WIDTH, (HEIGHT - FLOOR_HEIGHT) - partsBounds.y2,
+        //               WHITE);
+        // }
+        leftWingX = player.prevX - WING_WIDTH;
+        rightWingX = player.prevX + player.width;
+        
+        // Draw white background where player was (main body + wings)
+        // 1. Left wing
+        drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2, 
+                   leftWingX,
+                   WING_WIDTH, WING_HEIGHT,
+                   WHITE);
+        
+        // 2. Main body
+        drawRectDMA(player.prevY,
+                   player.prevX,
+                   player.width, player.height,
+                   WHITE);
+        
+        // 3. Right wing
+        drawRectDMA(player.prevY + (player.height - WING_HEIGHT)/2,
+                   rightWingX,
+                   WING_WIDTH, WING_HEIGHT,
+                   WHITE);
+
+        // drawRectDMA(player.prevY, player.prevX - WING_WIDTH, player.width + WING_WIDTH, player.height, WHITE);
         
         // Update and draw player
         updatePlayer(&player, currentButtons);
+        int collidedPart = checkPartSelection(&player);
+    
+        // Only draw the collided part (if any)
+        if (collidedPart >= 0) {
+          drawSinglePartOption(collidedPart);
+          // Handle part selection
+          if (KEY_JUST_PRESSED(BUTTON_B, currentButtons, previousButtons)) {
+            PartOption* selected = getPartAtPosition(player.x, player.y);
+            if (selected) {
+                selectPart(&character, selected);
+                drawCharacter(&character);
+            }
+          }
+        }
         drawPlayer(&player);
-        
-        // Debug: Show player position (optional)
-        char posText[30];
-        sprintf(posText, "X: %d Y: %d", player.x, player.y);
-        drawString(5, 5, posText, WHITE);
         
         // Return to title screen
         if (KEY_JUST_PRESSED(BUTTON_SELECT, currentButtons, previousButtons)) {

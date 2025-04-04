@@ -5,9 +5,10 @@
 #include "gba.h"
 
 typedef struct {
-    int x, y;          // Position
-    int width, height; // Size
-    int velX, velY;    // Velocity
+    int x, y;           // Current position
+    int prevX, prevY;   // Previous position
+    int width, height;
+    int velX, velY;
 } Player;
 
 // Player dimensions
@@ -20,5 +21,6 @@ typedef struct {
 void initPlayer(Player* player);
 void updatePlayer(Player* player, u32 currentButtons);
 void drawPlayer(Player* player);
+int checkPartSelection(Player* player);
 
 #endif

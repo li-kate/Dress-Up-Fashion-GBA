@@ -3,6 +3,8 @@
 #include "gba.h"
 #include "images/floorImage.h"
 #include "images/fairy.h"
+#include "images/curtains.h"
+#include "character.h"
 
 void initPlayer(Player* player) {
     player->x = WIDTH / 2 - PLAYER_WIDTH / 2;
@@ -17,6 +19,8 @@ void updatePlayer(Player* player, u32 currentButtons) {
     // Reset velocity
     player->velX = 0;
     player->velY = 0;
+    player->prevX = player->x;
+    player->prevY = player->y;
     
     // Handle input
     if (KEY_DOWN(BUTTON_LEFT, currentButtons)) {
@@ -43,16 +47,16 @@ void updatePlayer(Player* player, u32 currentButtons) {
     int bottomBoundary = player->y + player->height;
     
     // Screen boundary collision including wings
-    if (leftWingBoundary < 0) {
-        player->x = WING_WIDTH; // Keep wings on screen
+    if (leftWingBoundary < CURTAINS_WIDTH) {  // Left curtain collision
+        player->x = CURTAINS_WIDTH + WING_WIDTH;
     }
-    if (rightWingBoundary > WIDTH) {
+    if (rightWingBoundary > WIDTH) {  // Right screen edge
         player->x = WIDTH - player->width - WING_WIDTH;
     }
-    if (topBoundary < 0) {
-        player->y = 0; // Keep main body on screen
+    if (topBoundary < 0) {  // Top screen edge
+        player->y = 0;
     }
-    if (bottomBoundary > HEIGHT - FLOOR_HEIGHT) {
+    if (bottomBoundary > HEIGHT - FLOOR_HEIGHT) {  // Floor collision
         player->y = HEIGHT - FLOOR_HEIGHT - player->height;
     }
 }
@@ -70,4 +74,17 @@ void drawPlayer(Player* player) {
     drawRectDMA(player->y + (player->height - WING_HEIGHT)/2, 
                 player->x + player->width, 
                 WING_WIDTH, WING_HEIGHT, YELLOW);
+}
+
+int checkPartSelection(Player* player) {
+    // Check collision with all part options
+    for (int i = 0; i < 3; i++) {  // Changed from 3 to 9 to check all parts
+        if (player->x + player->width >= partOptions[i].x && 
+            player->x <= partOptions[i].x + partOptions[i].width &&
+            player->y + player->height >= partOptions[i].y && 
+            player->y <= partOptions[i].y + partOptions[i].height) {
+            return i; // Return index of part being hovered
+        }
+    }
+    return -1;
 }
