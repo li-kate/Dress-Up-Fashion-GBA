@@ -11,6 +11,6 @@ Mix and match a variety of outfit choices to create your perfect look. Once you'
 ## How to Download and Play the Game
 1. Download the Game Boy Advanced emulator, mGBA: https://mgba.io/downloads.html
 2. Download the App.gba file from this GitHub
-3. open the mGBA application or .exe
-4. go to File > Load ROM
-5. open the App.gba file
+3. Open the mGBA application or .exe
+4. Go to File > Load ROM
+5. Open the App.gba file
