@@ -14,3 +14,8 @@ Mix and match a variety of outfit choices to create your perfect look. Once you'
 3. Open the mGBA application or .exe
 4. Go to File > Load ROM
 5. Open the App.gba file
+
+## Images of the Game
+<img width="1438" height="953" alt="Dress-Up-Fashion-GBA" src="https://github.com/user-attachments/assets/b94f0ab7-cd9e-420e-8cae-cbd8d1fc2c67" />
+<img width="1441" height="952" alt="image" src="https://github.com/user-attachments/assets/84924cd2-cd89-4097-98d2-87e1cb7a55ab" />
+<img width="1452" height="960" alt="image" src="https://github.com/user-attachments/assets/bfa5f27c-925b-4333-b5ca-255b6d46acc9" />
